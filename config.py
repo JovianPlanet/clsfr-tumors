@@ -6,6 +6,20 @@ def get_parameters(mode):
 
     reg_mode = 'iatm-ctrls' # Options: iatm-ctrls, nfbs
 
+    model_dims = (120, 120, 77) # (128, 128, 64)
+    lr         = 0.0001
+    epochs     = 300
+    batch_size = 4
+    new_z      = [2, 2, 2]
+    n_heads    = 125
+    n_train    = 100
+    n_val      = 13
+    n_test     = 12
+
+    test_ds = 'IATM-controls' # 'IATM-controls', 'brats', 'reg-NFBS'
+
+    model_fn = 'prueba_.h5'
+
     brats_train = os.path.join('/home',
                               'davidjm',
                               'Downloads',
@@ -94,11 +108,6 @@ def get_parameters(mode):
 
     elif mode == 'train':
 
-        model_dims = (128, 128, 64)
-        lr = 0.0001
-        epochs = 300
-        batch_size = 4
-
         res_path = os.path.join('/media',
                                 'davidjm',
                                 'Disco_Compartido',
@@ -115,5 +124,34 @@ def get_parameters(mode):
                 'lr'            : lr,
                 'epochs'        : epochs,
                 'batch_size'    : batch_size,
+                'new_z'         : new_z,
+                'n_heads'       : n_heads,
+                'n_train'       : n_train,
+                'n_val'         : n_val,
+                'n_test'        : n_test,
+                'model_fn'      : model_fn,
                 'res_path'      : res_path, 
+        }
+
+    elif mode == 'test':
+
+        threshold = 0.5
+
+        return {'mode'               : mode,
+                'brats_train'        : brats_train,
+                'brats_val'          : brats_val,
+                'reg_nfbs_path'      : reg_nfbs_path,
+                'model_dims'         : model_dims,
+                'lr'                 : lr,
+                'epochs'             : epochs,
+                'batch_size'         : batch_size,
+                'new_z'              : new_z,
+                'n_heads'            : n_heads,
+                'n_train'            : n_train,
+                'n_val'              : n_val,
+                'n_test'             : n_test,
+                'thres'              : threshold,
+                'model_fn'           : model_fn,
+                'test_ds'            : test_ds, 
+                'reg_iatm_ctrl_path' : reg_iatm_ctrl_path
         }

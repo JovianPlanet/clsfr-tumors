@@ -1,6 +1,7 @@
 from config import get_parameters
 from transforms import registrate_NFBS, reg_IATM_controls
 from train import train
+from test import test
 
 def main(config):
 
@@ -20,5 +21,5 @@ def main(config):
         test(config)
 
 if __name__ == '__main__':
-    config = get_parameters('reg')
+    config = get_parameters('train')
     main(config)
