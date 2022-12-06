@@ -31,6 +31,7 @@ def test(config):
         for subject in subjects:
             studies = next(os.walk(os.path.join(config['reg_iatm_ctrl_path'], subject)))[1]
             p = os.path.join(config['reg_iatm_ctrl_path'], subject, studies[0], 'NIFTI', 'sub-'+subject[:-4]+'_T1w.nii.gz')
+            print(f'p = {p}')
             try:
                 control = preprocess(p, config)
             except:

@@ -49,41 +49,111 @@ def reg_IATM_controls(config):
 
         print(f'sujeto = {subject[:-4]}')
         studies = next(os.walk(os.path.join(config['iatm_ctrl_path'], subject)))[1]
-        print(f'study = {studies}')
-        reg_fn = 'sub-'+subject[:-4]+'_T1w.nii.gz'
-        p = os.path.join(config['iatm_ctrl_path'], subject, studies[0], 'NIFTI', reg_fn)
+        for study in studies:
+            print(f'\tstudy = {studies}')
+            files = next(os.walk(os.path.join(config['iatm_ctrl_path'], subject, study, 'NIFTI')))[2]
+            for file_ in files:
 
-        out_dir = os.path.join(config['reg_iatm_ctrl_path'], subject, studies[0], 'NIFTI')
-        brain = 'brain-'+reg_fn
-        b = os.path.join(out_dir, brain)
+                print(f'\t\tfile = {file_}')
+                p = os.path.join(config['iatm_ctrl_path'], subject, study, 'NIFTI', file_)
 
-        Path(out_dir).mkdir(parents=True, exist_ok=True)
+                out_dir = os.path.join(config['reg_iatm_ctrl_path'], subject, study, 'NIFTI')
+                brain = 'brain-'+file_
+                b = os.path.join(out_dir, brain)
 
-        try:
-            fsl_bet(p, b)
-        except:
-            print(f'No se encontro MRI para este estudio/paciente')
-            continue
-        try:
-            reg_img = image_read(b, pixeltype='unsigned int')
-        except:
-            print(f'No se encontro MRI para este estudio/paciente')
-            continue
+                Path(out_dir).mkdir(parents=True, exist_ok=True)
 
-        # Registrar imagen
-        rs2_img = registration(fixed=ref, 
-                               moving=reg_img, 
-                               type_of_transform=config['transforms'][4]
-        )
+                try:
+                    fsl_bet(p, b)
+                except:
+                    print(f'No se encontro MRI para este estudio/paciente')
+                    continue
+                try:
+                    reg_img = image_read(b, pixeltype='unsigned int')
+                except:
+                    print(f'No se encontro MRI para este estudio/paciente')
+                    continue
 
-        rs = apply_transforms(fixed=ref, 
-                              moving=reg_img, 
-                              transformlist=rs2_img['fwdtransforms'], 
-                              interpolator='linear' #'multiLabel'
-        )
+                # Registrar imagen
+                rs2_img = registration(fixed=ref, 
+                                       moving=reg_img, 
+                                       type_of_transform=config['transforms'][4]
+                )
 
-        os.remove(b)
-        image_write(rs, os.path.join(out_dir, reg_fn), ri=False)
+                rs = apply_transforms(fixed=ref, 
+                                      moving=reg_img, 
+                                      transformlist=rs2_img['fwdtransforms'], 
+                                      interpolator='linear' #'multiLabel'
+                )
+
+                os.remove(b)
+                image_write(rs, os.path.join(out_dir, file_), ri=False)
+
+'''
+Extrae craneo y registra los volumenes con FCD de IATM respecto a los de Brats
+'''
+def reg_IATM_FCD(config):
+
+    # Cargar MRI de referencia
+    ref = image_read(config['ref_mri'], pixeltype='unsigned int')
+
+    subjects = next(os.walk(config['iatm_fcd_path']))[1]
+    for subject in subjects[:]:
+
+        if 'FCD' in subject:
+
+            studies = next(os.walk(os.path.join(config['iatm_fcd_path'], subject)))[1]
+            for study in studies:
+                files = next(os.walk(os.path.join(config['iatm_fcd_path'], subject, study)))[2]
+                for file_ in files:
+                    if 'nii.gz' in file_ and not('json'      in file_ or 
+                                                 'Displasia' in file_ or 
+                                                 'DISPLASIA' in file_ or
+                                                 'mask'      in file_ or
+                                                 'Eq_1'      in file_):
+
+                        path = os.path.join(config['iatm_fcd_path'],
+                                            subject,
+                                            study,
+                                            file_
+                        )
+
+                        out_dir = os.path.join(config['reg_iatm_fcd_path'],
+                                               subject,
+                                               study
+                        )
+
+                        reg_fn = 'reg-' + file_
+                        brain = 'brain-' + file_
+                        b = os.path.join(out_dir, brain)
+
+                        Path(out_dir).mkdir(parents=True, exist_ok=True)
+
+                        try:
+                            fsl_bet(path, b)
+                        except:
+                            print(f'No se encontro MRI para este estudio/paciente')
+                            continue
+                        try:
+                            reg_img = image_read(b, pixeltype='unsigned int')
+                        except:
+                            print(f'No se encontro MRI para este estudio/paciente')
+                            continue
+
+                        # Registrar imagen
+                        rs2_img = registration(fixed=ref, 
+                                               moving=reg_img, 
+                                               type_of_transform=config['transforms'][4]
+                        )
+
+                        rs = apply_transforms(fixed=ref, 
+                                              moving=reg_img, 
+                                              transformlist=rs2_img['fwdtransforms'], 
+                                              interpolator='linear' #'multiLabel'
+                        )
+
+                        os.remove(b)
+                        image_write(rs, os.path.join(out_dir, reg_fn), ri=False)
 
 '''
 Performs FSL's skull striping

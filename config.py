@@ -4,7 +4,7 @@ def get_parameters(mode):
 
     # mode = 'reg' # available modes: 'reg', 'train', 'test'
 
-    reg_mode = 'iatm-ctrls' # Options: iatm-ctrls, nfbs
+    reg_mode = 'iatm-ctrls' # Options: iatm-ctrls, iatm-fcd, nfbs
 
     model_dims = (120, 120, 77) # (128, 128, 64)
     lr         = 0.0001
@@ -49,6 +49,20 @@ def get_parameters(mode):
                            'davidjm',
                            'Downloads',
                            'Reg-NFBS'
+    )
+
+    iatm_fcd_path = os.path.join('/media',
+                             'davidjm',
+                             'Disco_Compartido',
+                             'david',
+                             'datasets',
+                             'IATM-Dataset',
+    )
+
+    reg_iatm_fcd_path = os.path.join('/home',
+                           'davidjm',
+                           'Downloads',
+                           'Reg-IATM',
     )
 
     # imagen iatm control con resample
@@ -102,8 +116,10 @@ def get_parameters(mode):
                 'ref_mri'            : ref_mri, 
                 'reg_nfbs_path'      : reg_nfbs_path, 
                 'transforms'         : transforms,
+                'iatm_fcd_path'      : iatm_fcd_path,
+                'reg_iatm_fcd_path'  : reg_iatm_fcd_path,
                 'iatm_ctrl_path'     : iatm_ctrl_path,
-                'reg_iatm_ctrl_path' : reg_iatm_ctrl_path
+                'reg_iatm_ctrl_path' : reg_iatm_ctrl_path,
         }
 
     elif mode == 'train':

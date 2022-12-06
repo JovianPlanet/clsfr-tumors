@@ -1,5 +1,5 @@
 from config import get_parameters
-from transforms import registrate_NFBS, reg_IATM_controls
+from transforms import registrate_NFBS, reg_IATM_controls, reg_IATM_FCD
 from train import train
 from test import test
 
@@ -11,6 +11,8 @@ def main(config):
             registrate_NFBS(config)
         elif config['reg_mode'] == 'iatm-ctrls':
             reg_IATM_controls(config)
+        elif config['reg_mode'] == 'iatm-fcd':
+            reg_IATM_FCD(config)
             
     elif config['mode'] == 'train':
 
@@ -21,5 +23,5 @@ def main(config):
         test(config)
 
 if __name__ == '__main__':
-    config = get_parameters('train')
+    config = get_parameters('reg')
     main(config)
